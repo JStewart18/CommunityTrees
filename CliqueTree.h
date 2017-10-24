@@ -1,7 +1,7 @@
 #pragma once
 #include "CliqueTree.cpp"
 
-class CliqueTree {
+struct CliqueTree {
 	std::ifstream inFile;
 	DLinkedList nodeList;
 	DLinkedList leafList;
@@ -10,7 +10,8 @@ class CliqueTree {
 	pt::ptree* current;
 
 	CliqueTree::CliqueTree(std::string fileDirectory);
-
+	int level(std::string path);
+	pt::ptree parentOf(pt::ptree node);
 private:
 	int depth;
 	void buildLists(std::string fileDirectory);

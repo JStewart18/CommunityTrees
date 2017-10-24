@@ -9,7 +9,7 @@
 #include "DLinkedList.h"
 namespace pt = boost::property_tree;
 
-class CliqueTree {
+struct CliqueTree {
 	std::ifstream inFile;
 	DLinkedList nodeList;
 	DLinkedList leafList;
@@ -19,8 +19,8 @@ class CliqueTree {
 
 	CliqueTree::CliqueTree(std::string fileDirectory) { //needs depth set
 		buildLists(fileDirectory);
-
-		topRoot -> nodeList.top.data;
+		pt::ptree topNode = nodeList.*top;
+		topRoot = topNode.data;
 		current = topRoot;
 		leafList.current = leafList.top;
 
@@ -28,11 +28,7 @@ class CliqueTree {
 		//wefdfas
 			pt::ptree propTree;
 
-		auto& list = propTree.add_child(path, ptree{});	///change to INFO parser to use strings
-
-		for (auto data : { 12, 44, 23 })	//replace with actual data to be input to tree
-			list.add("value", data)
-			.add("<xmlattr>.active", true);
+		auto& list = propTree.add_child(path, ptree{});	///change to properly use parser
 
 		pt::xml_parser::write_xml(std::cout, propTree);
 		//fgrag
@@ -41,6 +37,20 @@ class CliqueTree {
 			
 			buildTree(topRoot, leafList.current, nodeList);
 		}*/
+	}
+
+	// returns the length of the path to the node specified
+	int level(std::string path) { //inelegant, but should function until the key field is more clear
+		int level = 0;
+		std::size_t found;
+		while (found != std::string::npos) {
+			found = path.find(".");
+			level++;
+		}
+		return level;
+	}
+	pt::ptree parentOf(pt::ptree node) {
+		return nodeAt(node.key.substr(0, node.key.length - 1)); // to path until
 	}
 
 private:
@@ -64,10 +74,10 @@ private:
 		//std::string x;
 		pt::ptree temp;
 		pt::ptree tTree;
-		while (inFile >> temp.data) { //seems odd, accpets string only when ptreee should be the case
+		while (inFile >> temp.data) {
 									  //temp.data = x.substr(0, x.find_first_of(";"));
 			nodeList.add(temp.data);
-			if (temp.data == Leaf) { //check if needs to be added to leaflist
+			if (leafList.contains(temp.data)) { //check if needs to be added to leaflist
 				leafList.add(temp.data); // same input data type oddness as above
 			}
 		}
